@@ -2,7 +2,7 @@
 %global gem_name sensu-extensions
 
 Name:           rubygem-%{gem_name}
-Version:        1.4.0
+Version:        1.5.0
 Release:        1%{?dist}
 Summary:        The Sensu extension loader library
 Group:          Development/Languages
@@ -15,7 +15,7 @@ BuildRequires:  rubygems-devel
 BuildRequires:  ruby
 BuildRequires:  rubygem(rspec)
 BuildRequires:  rubygem(eventmachine)
-BuildRequires:  rubygem(multi_json)
+BuildRequires:  rubygem(sensu-json) >= 1.1.0
 BuildRequires:  rubygem(sensu-extension) >= 1.3.0
 BuildRequires:  rubygem(sensu-logger)
 BuildRequires:  rubygem(sensu-settings)
@@ -100,6 +100,9 @@ popd
 %{gem_instdir}/Rakefile
 
 %changelog
+* Thu May 05 2016 Martin Mágr <mmagr@redhat.com> - 1.5.0-1
+- Updated to upstream version 1.5.0
+
 * Fri Feb 26 2016 Martin Mágr <mmagr@redhat.com> - 1.4.0-1
 - Updated to upstream version 1.4.0
 
