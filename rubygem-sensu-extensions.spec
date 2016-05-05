@@ -3,7 +3,7 @@
 
 Name:           rubygem-%{gem_name}
 Version:        1.5.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        The Sensu extension loader library
 Group:          Development/Languages
 License:        MIT
@@ -22,7 +22,7 @@ BuildRequires:  rubygem(sensu-settings)
 BuildRequires:  rubygem(sensu-em)
 BuildRequires:  rubygem(uuidtools)
 
-Requires:       rubygem(multi_json)
+Requires:       rubygem(sensu-json) >= 1.1.0
 Requires:       rubygem(sensu-extension)
 Requires:       rubygem(sensu-logger)
 Requires:       rubygem(sensu-settings)
@@ -75,9 +75,12 @@ pushd .%{gem_instdir}
 sed -i '/^.*codeclimate-test-reporter.*$/d' spec/helpers.rb
 sed -i /CodeClimate::TestReporter.start/d spec/helpers.rb
 
-# Add missing symlinks, which break unit tests,
+# Symlink extensions_symlinked was missing in the past, which breaks unit tests,
 # see https://github.com/sensu/sensu-extensions/issues/9
+# Currently extensions_symlinked is provided, but is not correct symlink,
+# so we have to recreate it anyway
 pushd ./spec/assets/extensions
+rm -f extensions_symlinked
 ln -s ../extensions_symlinked extensions_symlinked
 popd
 
@@ -100,6 +103,9 @@ popd
 %{gem_instdir}/Rakefile
 
 %changelog
+* Thu May 05 2016 Martin Mágr <mmagr@redhat.com> - 1.5.0-2
+- Fixed runtime JSON dependency
+
 * Thu May 05 2016 Martin Mágr <mmagr@redhat.com> - 1.5.0-1
 - Updated to upstream version 1.5.0
 
