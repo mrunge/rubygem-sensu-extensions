@@ -2,13 +2,14 @@
 %global gem_name sensu-extensions
 
 Name:           rubygem-%{gem_name}
-Version:        1.5.0
-Release:        2%{?dist}
+Version:        1.7.1
+Release:        1%{?dist}
 Summary:        The Sensu extension loader library
 Group:          Development/Languages
 License:        MIT
 URL:            https://github.com/sensu/sensu-extensions
 Source0:        https://rubygems.org/gems/%{gem_name}-%{version}.gem
+Source1:        https://github.com/sensu/%{gem_name}/archive/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 
 BuildRequires:  ruby(release)
 BuildRequires:  rubygems-devel
@@ -16,19 +17,28 @@ BuildRequires:  ruby
 BuildRequires:  rubygem(rspec)
 BuildRequires:  rubygem(eventmachine)
 BuildRequires:  rubygem(sensu-json) >= 1.1.0
-BuildRequires:  rubygem(sensu-extension) >= 1.3.0
+BuildRequires:  rubygem(sensu-extension)
 BuildRequires:  rubygem(sensu-logger)
 BuildRequires:  rubygem(sensu-settings)
-BuildRequires:  rubygem(sensu-em)
-BuildRequires:  rubygem(uuidtools)
+BuildRequires:  rubygem(sensu-extensions-debug) = 1.0.0
+BuildRequires:  rubygem(sensu-extensions-json) = 1.0.0
+BuildRequires:  rubygem(sensu-extensions-occurrences) = 1.1.0
+BuildRequires:  rubygem(sensu-extensions-only-check-output) = 1.0.0
+BuildRequires:  rubygem(sensu-extensions-ruby-hash) = 1.0.0
+BuildRequires:  rubygem(sensu-extensions-system-profile) = 1.0.0
 
 Requires:       rubygem(sensu-json) >= 1.1.0
 Requires:       rubygem(sensu-extension)
 Requires:       rubygem(sensu-logger)
 Requires:       rubygem(sensu-settings)
+Requires:       rubygem(sensu-extensions-debug) = 1.0.0
+Requires:       rubygem(sensu-extensions-json) = 1.0.0
+Requires:       rubygem(sensu-extensions-occurrences) = 1.1.0
+Requires:       rubygem(sensu-extensions-only-check-output) = 1.0.0
+Requires:       rubygem(sensu-extensions-ruby-hash) = 1.0.0
 
 BuildArch: noarch
-%if 0%{?fedora} <= 20 || 0%{?el7}
+%if 0%{?rhel}
 Provides:       rubygem(%{gem_name}) = %{version}
 %endif
 
@@ -65,16 +75,15 @@ mkdir -p %{buildroot}%{gem_dir}
 cp -a .%{gem_dir}/* \
         %{buildroot}%{gem_dir}/
 
+install -d -p %{_builddir}%{gem_instdir}
+tar -xvzf %{SOURCE1} -C %{_builddir}/%{gem_name}-%{version}/%{gem_instdir} --strip-components=1 %{gem_name}-%{version}/spec
+
 rm -f %{buildroot}%{gem_instdir}/{.gitignore,.travis.yml}
 
 
 # Run the test suite
 %check
 pushd .%{gem_instdir}
-# Disable codeclimate-test-reporter as it's not needed
-sed -i '/^.*codeclimate-test-reporter.*$/d' spec/helpers.rb
-sed -i /CodeClimate::TestReporter.start/d spec/helpers.rb
-
 # Symlink extensions_symlinked was missing in the past, which breaks unit tests,
 # see https://github.com/sensu/sensu-extensions/issues/9
 # Currently extensions_symlinked is provided, but is not correct symlink,
@@ -94,15 +103,15 @@ popd
 %{gem_spec}
 %doc %{gem_instdir}/LICENSE.txt
 %doc %{gem_instdir}/README.md
-%doc %{gem_instdir}/Gemfile
 
 %files doc
 %doc %{gem_docdir}
-%{gem_instdir}/spec
 %{gem_instdir}/%{gem_name}.gemspec
-%{gem_instdir}/Rakefile
 
 %changelog
+* Fri Dec 23 2016 Martin Mágr <mmagr@redhat.com> - 1.7.1-1
+- Updated to latest upstream release
+
 * Thu May 05 2016 Martin Mágr <mmagr@redhat.com> - 1.5.0-2
 - Fixed runtime JSON dependency
 
